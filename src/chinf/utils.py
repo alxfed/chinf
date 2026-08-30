@@ -12,15 +12,15 @@ from os import environ
 
 
 # The configuration.
-api_key = environ.get("DEPSEK_API_KEY", '')
-default_model = environ.get("DEPSEK_DEFAULT_MODEL", 'deepseek-v4-pro')
-api_base = environ.get("DEPSEK_API_BASE", "https://api.deepseek.com")
+api_key = environ.get("CHINF_API_KEY", '')
+default_model = environ.get("CHINF_DEFAULT_MODEL", 'gpt-5.6-luna')
+api_base = environ.get("CHINF_API_BASE", "https://api.cheaperinference.com/v1")
 
 # Set the mandatory headers
 headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {api_key}",
-    "User-Agent": "depsek"
+    "User-Agent": "chinf"
 }
 
 

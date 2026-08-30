@@ -1,13 +1,13 @@
-# DepSek
-API calls to DepSek without dependencies.
+# Chinf
+API calls to Cheap Inference without dependencies.
 <pre>
-  pip install depsek
+  pip install chinf
 </pre>
 Then:
 ```Python
 # Python
 from yaml import safe_load as yl
-from depsek.chat import chat_complete as cc
+from chinf.chat import chat_complete as cc
 
 kwargs = """  # this is a string in YAML format
   max_tokens:   32000
@@ -52,7 +52,7 @@ thoughts, text = cc(
 or
 ```Python
 from yaml import safe_load as yl
-from depsek.messages import message
+from chinf.messages import message
 
 
 kwargs = """  # this is a string in YAML format
@@ -103,7 +103,7 @@ or
 
 ```Python
 from yaml import safe_load as yl
-from depsek.responses import respond
+from chinf.responses import respond
 
 
 kwargs = """  # this is a string in YAML format

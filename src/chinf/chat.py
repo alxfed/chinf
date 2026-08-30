@@ -77,7 +77,7 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
         result = query(payload, '/chat/completions')
         message = result['choices'][0]['message']
         instruction_and_contents.append(message)
-        thoughts = message['reasoning_content']
+        thoughts = message['reasoning']
         text = message['content']
         function_calls = message.get('tool_calls', [])
 

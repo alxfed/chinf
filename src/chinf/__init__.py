@@ -6,7 +6,7 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 from .utils import (query,
-                    headers,
+                    oai_headers, ant_headers,
                     get_function,
                     get_func_args,
                     call_function,
@@ -24,7 +24,8 @@ __all__ = [
     "message",
     # The API calling
     "query",
-    "headers",
+    "oai_headers",
+    "ant_headers",
     # and all the function calling stuff
     "get_function",
     "get_func_args",

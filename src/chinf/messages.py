@@ -19,14 +19,8 @@ def get_weather(location):
 
 
 def message(messages=None, instructions=None, tools=None, **kwargs):
-    """A continuation of text with a given context and instruction.
-        kwargs:
-            temperature     = 0 to 1.0
-            top_p           = 0.0 to 1.0
-            top_k           = The maximum number of tokens to consider when sampling.
-            n               = 1 to ...
-            max_tokens      = number of tokens
-            stop            = ['stop']  array of up to 4 sequences
+    """ A messages (Anthropic) API
+        https://platform.cheaperinference.com/docs#messages-api
     """
     # instruction         = kwargs.get('system_instruction', instructions)
     # first_message       = [dict(role='system', content=instruction)] if instruction else []
@@ -58,10 +52,9 @@ def message(messages=None, instructions=None, tools=None, **kwargs):
     if tools:
         payload['tools'] = tools
         payload['parallel_tool_calls'] = True
-        payload['tool_choice'] = 'auto'
 
     while True:
-        result = query(payload, '/messages')
+        result = query(payload, '/messages', header=True)
         completion_message = result['content']
         thoughts, text, function_calls = decode(completion_message)
         if function_calls:

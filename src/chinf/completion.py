@@ -10,18 +10,7 @@ from .utils import (default_model,
 
 
 def complete(text, **kwargs):
-    """A completions endpoint call through requests.
-        kwargs:
-            temperature     = 0 to 1.0
-            top_p           = 0.0 to 1.0
-            n               = 1 to 128
-            best_of         = 4
-            frequency_penalty = -2.0 to 2.0
-            presence_penalty = -2.0 to 2.0
-            max_tokens      = number of tokens
-            logprobs        = number up to 5
-            stop            = ["stop"]  array of up to 4 sequences
-            logit_bias      = map token: bias -1.0 to 1.0 (restrictive -100 to 100)
+    """A completion endpoint call
     """
     responses = []
     payload = {

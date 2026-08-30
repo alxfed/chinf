@@ -17,9 +17,16 @@ default_model = environ.get("CHINF_DEFAULT_MODEL", 'gpt-5.6-luna')
 api_base = environ.get("CHINF_API_BASE", "https://api.cheaperinference.com/v1")
 
 # Set the mandatory headers
-headers = {
+oai_headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {api_key}",
+    "User-Agent": "chinf"
+}
+
+ant_headers = {
+    "X-Api-Key": api_key,
+    "Anthropic-Version": "2023-06-01",
+    "Content-Type": "application/json",
     "User-Agent": "chinf"
 }
 
@@ -71,9 +78,13 @@ def call_function(func, func_args):
     return result
 
 
-def query(payload, url_suffix):
+def query(payload, url_suffix, header: bool=False):
     # Convert data dictionary to JSON and encode it to bytes
     data_bytes = json.dumps(payload).encode('utf-8')
+    if header:
+        headers = ant_headers
+    else:
+        headers = oai_headers
     # Create the Request object
     req = urllib.request.Request(
         f'{api_base}{url_suffix}',

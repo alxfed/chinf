@@ -27,12 +27,10 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
     # Define the initial payload
     payload = {
         "model":            kwargs.get("model", default_model),
+        "store":            False,
         "instructions":     instruction,
         "input":            messages,
-        "previous_response_id": kwargs.get("previous_response_id", None),
         "max_output_tokens": kwargs.get("max_tokens", 132000),
-        "prompt_cache_retention": "in_memory",
-        "include": ["reasoning.encrypted_content"],
         "reasoning": {
             "effort": "high",
             "summary": "detailed"
@@ -73,7 +71,7 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
 
             # Now that all responses have been gathered
             # we can change the payload and send them back
-            payload['previous_response_id'] = response_id
+            # payload['previous_response_id'] = response_id
             payload['input'] = function_outputs_messages
         else:
             break

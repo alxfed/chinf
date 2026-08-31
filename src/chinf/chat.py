@@ -6,7 +6,6 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 import json
-from os import environ
 from .utils import (query,
                     default_model,
                     get_function,
@@ -17,36 +16,6 @@ from .utils import (query,
 def get_weather(location):
     print(f"Executing weather tool for location: {location}")
     return {"temperature": "72F", "condition": "Sunny"}
-#
-#
-# def query(payload):
-#     # Convert data dictionary to JSON and encode it to bytes
-#     data_bytes = json.dumps(payload).encode('utf-8')
-#     # Create the Request object
-#     req = urllib.request.Request(
-#         f'{api_base}/chat/completions',
-#         data=data_bytes,
-#         headers=headers,
-#         method="POST")
-#     # Try to query
-#     try:
-#         # Execute the request
-#         with urllib.request.urlopen(req, timeout=3000) as response:
-#             response_data = response.read().decode('utf-8')
-#             output = json.loads(response_data)
-#         return output
-#
-#     except urllib.error.HTTPError as e:
-#         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
-#         error_info = e.read().decode('utf-8', errors='ignore')
-#         print(f"HTTP Error {e.code}: {e.reason}")
-#         print(f"Error Details: {error_info}")
-#         return {}
-#
-#     except urllib.error.URLError as e:
-#         # Handle network/connection errors
-#         print(f"Failed to reach the server: {e.reason}")
-#         return {}
 
 
 def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
@@ -99,14 +68,14 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
 
                 # Look up tool by name in globals and caller frames
                 func = globals().get(func_name)
-                # if not func:
-                #     import inspect
-                #     frame = inspect.currentframe().f_back
-                #     while frame:
-                #         if func_name in frame.f_globals:
-                #             func = frame.f_globals[func_name]
-                #             break
-                #         frame = frame.f_back
+                if not func:
+                    import inspect
+                    frame = inspect.currentframe().f_back
+                    while frame:
+                        if func_name in frame.f_globals:
+                            func = frame.f_globals[func_name]
+                            break
+                        frame = frame.f_back
 
                 if func and callable(func):
                     try:

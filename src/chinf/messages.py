@@ -54,7 +54,7 @@ def message(messages=None, instructions=None, tools=None, **kwargs):
         payload['parallel_tool_calls'] = True
 
     while True:
-        result = query(payload, '/messages', header=True)
+        result = query(payload, '/messages')
         completion_message = result['content']
         thoughts, text, function_calls = decode(completion_message)
         if function_calls:

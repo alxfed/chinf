@@ -10,7 +10,8 @@ from .utils import (query,
                     default_model,
                     get_function,
                     get_func_args,
-                    call_function)
+                    call_function,
+                    llm_soup_to_text)
 
 
 def get_weather(location):
@@ -46,7 +47,7 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
         result = query(payload, '/chat/completions')
         message = result['choices'][0]['message']
         instruction_and_contents.append(message)
-        thoughts = message['reasoning']
+        thoughts = llm_soup_to_text(message['reasoning'])
         text = message['content']
         function_calls = message.get('tool_calls', [])
 

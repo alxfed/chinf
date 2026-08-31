@@ -6,7 +6,8 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 from .utils import (query,
-                    default_model)
+                    default_model,
+                    llm_soup_to_text)
 
 
 def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
@@ -30,7 +31,7 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
 
     result = query(payload, '/chat/completions')
     message = result['choices'][0]['message']
-    thoughts = message['reasoning']
+    thoughts = llm_soup_to_text(message['reasoning'])
     text = message['content']
 
     return thoughts, text

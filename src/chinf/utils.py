@@ -9,6 +9,8 @@ import json
 import urllib.request
 import urllib.error
 from os import environ
+import re
+import html
 
 
 # The configuration.
@@ -131,3 +133,91 @@ def decode(output):
     function_calls = [part for part in output if part['type'] == 'tool_use']
 
     return thoughts, text, function_calls
+
+def llm_soup_to_text(llm_response):
+    """
+    Cleans and transforms text from Large Language Models (LLMs) by:
+    - Removing all Markdown formatting (bold, italics, headers, lists, code blocks, links, etc.).
+    - Consolidating multiple newlines into a consistent paragraph separator (`\n\t`).
+    - Removing extraneous tabs and multiple spaces.
+    - Trimming leading/trailing whitespace.
+    """
+    if not isinstance(llm_response, str):
+        return ""
+
+    text = llm_response
+
+    # --- Step 0: Unescape HTML Entities First ---
+    text = html.unescape(text)
+
+    # --- Step 1: Normalize Newlines & Initial Cleanup ---
+    text = text.replace('\r\n', '\n')
+
+    # --- Step 2: Remove Fenced Code Blocks completely ---
+    # Multiline flag allows ^ to match start of lines.
+    text = re.sub(r'^```[^\n]*\n([\s\S]*?)\n```', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^~~~[^\n]*\n([\s\S]*?)\n~~~', '', text, flags=re.MULTILINE)
+    # Catch ones that might not be at start of line or properly closed with newline
+    text = re.sub(r'```[^\n]*\n([\s\S]*?)```', '', text)
+    text = re.sub(r'~~~[^\n]*\n([\s\S]*?)~~~', '', text)
+
+    # --- Step 3: Remove HTML Comments and Tags ---
+    text = re.sub(r'<!--[\s\S]*?-->', '', text)
+
+    # We want <br> to become newline before stripping tags to preserve line breaks
+    text = re.sub(r'<br\s*/?>', '\n', text, flags=re.IGNORECASE)
+    # Strip other HTML tags, keeping inner text
+    text = re.sub(r'<[^>]+>', '', text)
+
+    # --- Step 4: Remove Block-Level Markdown Elements ---
+    # Horizontal rules
+    text = re.sub(r'^\s*(?:-|\*|_){3,}\s*$', '', text, flags=re.MULTILINE)
+    # Blockquotes: remove leading >
+    text = re.sub(r'^\s*>\s*', '', text, flags=re.MULTILINE)
+
+    # --- Step 5: Remove Headers ---
+    # ATX headers (# Header)
+    text = re.sub(r'^\s*#{1,6}\s*', '', text, flags=re.MULTILINE)
+    # Setext headers (Underlines Header\n===)
+    text = re.sub(r'^([^\n]+)\n\s*(?:=|-){2,}\s*$', r'\1', text, flags=re.MULTILINE)
+
+    # --- Step 6: Remove Links and Images ---
+    # Images: ![alt](url) -> remove entire image
+    text = re.sub(r'!\[.*?\]\([^\)]*\)', '', text)
+    # Links: [text](url) -> keep `text`
+    text = re.sub(r'\[([^\]]+)\]\([^\)]*\)', r'\1', text)
+
+    # --- Step 7: Remove Inline Markdown Elements ---
+    text = re.sub(r'`([^`]+)`', r'\1', text)
+    # Bold / Italic - ensure we catch both, ordering matters (*** then ** then *)
+    text = re.sub(r'\*{3}([^*]+)\*{3}', r'\1', text)
+    text = re.sub(r'_{3}([^_]+)_{3}', r'\1', text)
+    text = re.sub(r'\*{2}([^*]+)\*{2}', r'\1', text)
+    text = re.sub(r'_{2}([^_]+)_{2}', r'\1', text)
+    text = re.sub(r'\*([^*]+)\*', r'\1', text)
+    text = re.sub(r'_([^_]+)_', r'\1', text)
+    # Strikethrough
+    text = re.sub(r'~~([^~]+)~~', r'\1', text)
+
+    # --- Step 8: Remove List Markers ---
+    text = re.sub(r'^\s*(?:[-*+]|\d+\.)\s+', '', text, flags=re.MULTILINE)
+
+    # --- Step 9: Final Whitespace & Paragraph Normalization ---
+    # Strip spaces from each line
+    lines = [line.strip() for line in text.split('\n')]
+    text = '\n'.join(lines)
+
+    # Convert tabs and multiple spaces to single space
+    text = text.replace('\t', ' ')
+    text = re.sub(r' {2,}', ' ', text)
+
+    # Consolidate multiple newlines to paragraph separator `\n\t`
+    text = re.sub(r'\n{2,}', '\n\t', text)
+
+    # --- Step 10: Final Trimming ---
+    text = text.strip()
+    text = re.sub(r'^[\n\t]+', '', text)
+    text = re.sub(r'[\n\t]+$', '', text)
+
+    return text
+

@@ -27,14 +27,9 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
         "max_tokens":       kwargs.get("max_tokens", 132000),
         "reasoning_effort": "max",
     }
-    # Tools if there are some
-    if tools:
-        payload['tools'] = tools
-        payload['tool_choice'] = 'auto'
 
     result = query(payload, '/chat/completions')
     message = result['choices'][0]['message']
-    instruction_and_contents.append(message)
     thoughts = message['reasoning']
     text = message['content']
 

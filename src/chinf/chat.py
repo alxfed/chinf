@@ -35,7 +35,7 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
         "model":            kwargs.get("model", default_model),
         "messages":         instruction_and_contents,
         "max_tokens":       kwargs.get("max_tokens", 132000),
-        "reasoning_effort": "max",
+        "reasoning_effort": kwargs.get("reasoning_effort", "low"),
     }
     # Tools if there are some
     if tools:

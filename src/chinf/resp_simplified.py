@@ -25,7 +25,7 @@ def respond(messages=None, instructions=None, **kwargs):
         "max_output_tokens": kwargs.get("max_tokens", 132000),
         "prompt_cache_retention": "in_memory",
         "reasoning": {
-            "effort": "high",
+            "effort": kwargs.get("reasoning_effort", "low"),
             "summary": "detailed"
         }
     }

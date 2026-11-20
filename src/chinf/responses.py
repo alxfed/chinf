@@ -32,7 +32,7 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
         "input":            messages,
         "max_output_tokens": kwargs.get("max_tokens", 132000),
         "reasoning": {
-            "effort": "high",
+            "effort": kwargs.get("reasoning_effort", "low"),
             "summary": "detailed"
         }
     }

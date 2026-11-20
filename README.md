@@ -10,6 +10,7 @@ from yaml import safe_load as yl
 from chinf.chat import chat_complete as cc
 
 kwargs = """  # this is a string in YAML format
+  model:        gpt-5.2
   max_tokens:   32000
   stop_sequences:
     - STOP
@@ -49,6 +50,35 @@ thoughts, text = cc(
     **yl(kwargs)
 )
 ```
+If you don't need 'tools':
+```Python
+# Python
+from yaml import safe_load as yl
+from chinf.chat_simplified import chat_complete as cc
+
+kwargs = """  # this is a string in YAML format
+  model:        gpt-5.2
+  max_tokens:   32000
+  stop_sequences:
+    - STOP
+    - "\nTitle"
+  temperature:  1.0
+  top_k:        10
+  top_p:        0.5
+  reasoning_effort: high
+"""
+
+instruction = 'You are a helpful assistant. Do not use markdown or lists in your responses.'
+
+msgs = [{'role': 'user', 'content': 'Are language models seeking the Truth?'}]
+
+thoughts, text = cc(
+    messages=msgs,
+    instructions=instruction,
+    **yl(kwargs)
+)
+```
+
 or
 ```Python
 from yaml import safe_load as yl

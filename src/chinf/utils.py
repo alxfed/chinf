@@ -23,6 +23,7 @@ headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {api_key}",
     "X-Api-Key": api_key,
+    "X-CI-Model-Lock": True,
     "Anthropic-Version": "2023-06-01",
     "User-Agent": "chinf"
 }
@@ -75,12 +76,12 @@ def call_function(func, func_args):
     return result
 
 
-def query(payload, url_suffix):
+def query(payload, url_suffix, base_url=api_base):
     # Convert data dictionary to JSON and encode it to bytes
     data_bytes = json.dumps(payload).encode('utf-8')
     # Create the Request object
     req = urllib.request.Request(
-        f'{api_base}{url_suffix}',
+        f'{base_url}{url_suffix}',
         data=data_bytes,
         headers=headers,
         method="POST")

@@ -35,7 +35,11 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
     if reasoning:
         thoughts = llm_soup_to_text(reasoning)
     else:
-        thoughts = ''
+        reasoning_content = message.get('reasoning_content', '')
+        if reasoning_content:
+            thoughts = llm_soup_to_text(reasoning_content)
+        else:
+            thoughts = ''
     text = message['content']
 
     return thoughts, text

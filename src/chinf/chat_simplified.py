@@ -33,7 +33,7 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
     choice = result.get('choices', {})
     if choice:
         message = choice[0]['message']
-        thoughts = message.get('reasoning') or message('reasoning_content') or ''
+        thoughts = message.get('reasoning') or message.get('reasoning_content') or ''
         text = message.get('content', '')
     else:
         thoughts = ''

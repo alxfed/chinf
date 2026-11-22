@@ -45,14 +45,16 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
     while True:
         # Query the API
         result = query(payload, '/chat/completions')
-        message = result['choices'][0]['message']
-        instruction_and_contents.append(message)
-        reasoning = message.get('reasoning', '')
-        if reasoning:
-            thoughts = llm_soup_to_text(reasoning)
-        else: thoughts = ''
-        text = message['content']
-        function_calls = message.get('tool_calls', [])
+        choice = result.get('choices', [])
+        if choice:
+            message = choice[0]['message']
+            thoughts = message.get('reasoning') or message('reasoning_content') or ''
+            text = message.get('content', '')
+            function_calls = message.get('tool_calls', [])
+        else:
+            thoughts = ''
+            text = ''
+            function_calls = []
 
         if function_calls:
             for function_call in function_calls:

@@ -36,12 +36,13 @@ def batch_request(batch=None, **kwargs):
         # Check status
         status, rawStatus = batch_status(batchid=batchId)
         if status == 'completed':
-            thoughts, text = read_batch_result(batchId=batchId)
+            result = read_batch_result(batchId=batchId)
             break
         if count == 60:
-            thoughts, text = '', ''
-            break
+            return '', ''
 
+    text = result
+    thoughts = result
     return thoughts, text
 
 def start_batch(batch=None, **kwargs):

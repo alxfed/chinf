@@ -138,19 +138,19 @@ def start_batch_query(payload, **kwargs):
             headers = dict(response.headers)
             response_data = response.read().decode('utf-8')
             output = json.loads(response_data)
-        return output
+        return output, headers
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors
         error_info = e.read().decode('utf-8', errors='ignore')
         print(f"HTTP Error {e.code}: {e.reason}")
         print(f"Error Details: {error_info}")
-        return {}
+        return {}, headers
 
     except urllib.error.URLError as e:
         # Handle network/connection errors
         print(f"Failed to reach the server: {e.reason}")
-        return {}
+        return {}, headers
 
 
 def batch_query(batchId, url_suffix='/status', **kwargs):

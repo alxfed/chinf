@@ -5,14 +5,23 @@
 This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
-import json
-import urllib.request
-import urllib.error
-from os import environ
-import re
-import html
-from .utils import start_batch_query, batch_query, default_batch_model
+from .utils import (start_batch_query,
+                    batch_query,
+                    read_batch_result,
+                    default_batch_model)
 
+
+def batch_request(batch=None, **kwargs):
+    """ Batch query, waiting and cancellation."""
+    payload = {
+        "requests": batch
+    }
+    result, hdrs = start_batch_query(payload, **kwargs)
+    if result:
+        response = result
+    else:
+        response = ''
+    return result
 
 def start_batch(batch=None, **kwargs):
     """ All parameters should be in kwargs, but they are optional
@@ -50,12 +59,14 @@ def start_batch(batch=None, **kwargs):
 
 def batch_status(batchid):
     result = batch_query(batchId=batchid, url_suffix='/status')
+    return result
 
 def cancel_batch(batchid):
-    ...
+    result = batch_query(batchId=batchid, url_suffix='/status')
+    return result
 
 def batch_result(batchid):
-    ...
+    result = read_batch_result(batchid)
 
 
 if __name__ == "__main__":

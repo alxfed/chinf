@@ -207,8 +207,11 @@ def read_batch_result(batchId, **kwargs):
         with urllib.request.urlopen(req, timeout=3000) as response:
             headers = dict(response.headers)
             response_data = response.read().decode('utf-8')
-            output = json.loads(response_data)
-        return output
+            if response_data['status'] == 'succeeded':
+                return json.loads(response_data)
+            else:
+                empty_return = {'result': {'content': [{'type': 'text', 'text':''}]}}
+                return empty_return
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)

@@ -9,6 +9,7 @@ from .utils import (start_batch_query,
                     batch_query,
                     read_batch_result,
                     default_batch_model)
+from time import sleep
 
 
 def batch_request(batch=None, **kwargs):
@@ -23,8 +24,25 @@ def batch_request(batch=None, **kwargs):
         rawStatus = result['rawStatus']
         providerMetadata = result['providerMetadata']
     else:
-        response = ''
-    return result
+        return '', ''
+
+    while True:
+        # Sleep a little bit
+        try:
+            sleep(10)
+            count += 1
+        except NameError:
+            count = 1
+        # Check status
+        status, rawStatus = batch_status(batchid=batchId)
+        if status == 'ready':
+            thoughts, text = read_batch_result(batchId=batchId)
+            break
+        if count == 60:
+            thoughts, text = '', ''
+            break
+
+    return thoughts, text
 
 def start_batch(batch=None, **kwargs):
     """ All parameters should be in kwargs, but they are optional
@@ -62,11 +80,11 @@ def start_batch(batch=None, **kwargs):
 
 def batch_status(batchid):
     result = batch_query(batchId=batchid, url_suffix='/status')
-    return result
+    return result['status'], result['rawStatus']
 
 def cancel_batch(batchid):
     result = batch_query(batchId=batchid, url_suffix='/cancel')
-    return result
+    return result['status'], result['rawStatus']
 
 def batch_result(batchid):
     result = read_batch_result(batchid)

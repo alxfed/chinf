@@ -35,7 +35,7 @@ def batch_request(batch=None, **kwargs):
             count = 1
         # Check status
         status, rawStatus = batch_status(batchid=batchId)
-        if status == 'ready':
+        if status == 'completed':
             thoughts, text = read_batch_result(batchId=batchId)
             break
         if count == 60:

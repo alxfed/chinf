@@ -8,7 +8,8 @@ LICENSE file in the root directory of this source tree.
 from .utils import (start_batch_query,
                     batch_query,
                     read_batch_result,
-                    default_batch_model)
+                    default_batch_model,
+                    decode)
 from time import sleep
 
 
@@ -41,8 +42,9 @@ def batch_request(batch=None, **kwargs):
         if count == 60:
             return '', ''
 
-    text = result
-    thoughts = result
+    list_of_dict = result['result']['content']
+    thoughts, text, function_calls = decode(list_of_dict)
+
     return thoughts, text
 
 def start_batch(batch=None, **kwargs):

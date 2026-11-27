@@ -17,6 +17,9 @@ import html
 api_key = environ.get("CHINF_API_KEY", '')
 default_model = environ.get("CHINF_DEFAULT_MODEL", 'gpt-5.6-luna')
 api_base = environ.get("CHINF_API_BASE", "https://api.cheaperinference.com/v1")
+# Batch configuration.
+default_batch_model = environ.get("CHINF_DEFAULT_BATCH_MODEL", 'claude-haiku-4.5-batch')
+batch_api_base = environ.get("CHINF_BATCH_API_BASE", "https://api.cheaperinference.com/v4/ai/batch")
 
 # Set the mandatory headers
 headers = {
@@ -26,6 +29,13 @@ headers = {
     "X-CI-Model-Lock": True,
     "Anthropic-Version": "2023-06-01",
     "User-Agent": "chinf"
+}
+
+# Set the batch headers
+batch_headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {api_key}",
+    "User-Agent": "chinf_batch"
 }
 
 
@@ -89,6 +99,113 @@ def query(payload, url_suffix, base_url=api_base):
     try:
         # Execute the request
         with urllib.request.urlopen(req, timeout=3000) as response:
+            response_data = response.read().decode('utf-8')
+            output = json.loads(response_data)
+        return output
+
+    except urllib.error.HTTPError as e:
+        # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
+        error_info = e.read().decode('utf-8', errors='ignore')
+        print(f"HTTP Error {e.code}: {e.reason}")
+        print(f"Error Details: {error_info}")
+        return {}
+
+    except urllib.error.URLError as e:
+        # Handle network/connection errors
+        print(f"Failed to reach the server: {e.reason}")
+        return {}
+
+
+def start_batch_query(payload, **kwargs):
+    """ Start batch processing by a query.
+    """
+    # Read model from kwargs or substitute the default into the header and on.
+    model = kwargs.get("model", default_batch_model),
+    batch_headers["ai-model-id"] = model
+
+    # Convert data dictionary to JSON and encode it to bytes
+    data_bytes = json.dumps(payload).encode('utf-8')
+    # Create the Request object
+    req = urllib.request.Request(
+        f'{batch_api_base}/start',
+        data=data_bytes,
+        headers=batch_headers,
+        method="POST")
+    # Try to query
+    try:
+        # Execute the request
+        with urllib.request.urlopen(req, timeout=3000) as response:
+            headers = dict(response.headers)
+            response_data = response.read().decode('utf-8')
+            output = json.loads(response_data)
+        return output
+
+    except urllib.error.HTTPError as e:
+        # Handle HTTP errors
+        error_info = e.read().decode('utf-8', errors='ignore')
+        print(f"HTTP Error {e.code}: {e.reason}")
+        print(f"Error Details: {error_info}")
+        return {}
+
+    except urllib.error.URLError as e:
+        # Handle network/connection errors
+        print(f"Failed to reach the server: {e.reason}")
+        return {}
+
+
+def batch_query(batchId, url_suffix='/status', **kwargs):
+    """"""
+    payload = {
+        "batchId": batchId
+    }
+    # Convert data dictionary to JSON and encode it to bytes
+    data_bytes = json.dumps(payload).encode('utf-8')
+    # Create the Request object
+    req = urllib.request.Request(
+        f'{batch_api_base}{url_suffix}',
+        data=data_bytes,
+        headers=batch_headers,
+        method="POST")
+    # Try to query
+    try:
+        # Execute the request
+        with urllib.request.urlopen(req, timeout=3000) as response:
+            headers = dict(response.headers)
+            response_data = response.read().decode('utf-8')
+            output = json.loads(response_data)
+        return output
+
+    except urllib.error.HTTPError as e:
+        # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
+        error_info = e.read().decode('utf-8', errors='ignore')
+        print(f"HTTP Error {e.code}: {e.reason}")
+        print(f"Error Details: {error_info}")
+        return {}
+
+    except urllib.error.URLError as e:
+        # Handle network/connection errors
+        print(f"Failed to reach the server: {e.reason}")
+        return {}
+
+
+def read_batch_result(batchId, **kwargs):
+    """"""
+    payload = {
+        "batchId": batchId
+    }
+    # Convert data dictionary to JSON and encode it to bytes
+    data_bytes = json.dumps(payload).encode('utf-8')
+    # Create the Request object
+    req = urllib.request.Request(
+        f'{batch_api_base}/results',
+        data=data_bytes,
+        headers=batch_headers,
+        method="POST")
+    # Try to query
+    try:
+        # Execute the request
+        with urllib.request.urlopen(req, timeout=3000) as response:
+            headers = dict(response.headers)
             response_data = response.read().decode('utf-8')
             output = json.loads(response_data)
         return output

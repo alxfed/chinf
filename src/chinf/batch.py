@@ -18,7 +18,10 @@ def batch_request(batch=None, **kwargs):
     }
     result, hdrs = start_batch_query(payload, **kwargs)
     if result:
-        response = result
+        batchId = result['batchId']
+        status = result['status']
+        rawStatus = result['rawStatus']
+        providerMetadata = result['providerMetadata']
     else:
         response = ''
     return result
@@ -62,7 +65,7 @@ def batch_status(batchid):
     return result
 
 def cancel_batch(batchid):
-    result = batch_query(batchId=batchid, url_suffix='/status')
+    result = batch_query(batchId=batchid, url_suffix='/cancel')
     return result
 
 def batch_result(batchid):

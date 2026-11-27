@@ -120,7 +120,7 @@ def start_batch_query(payload, **kwargs):
     """ Start batch processing by a query.
     """
     # Read model from kwargs or substitute the default into the header and on.
-    model = kwargs.get("model", default_batch_model),
+    model = kwargs.get("model", default_batch_model)
     batch_headers["ai-model-id"] = model
 
     # Convert data dictionary to JSON and encode it to bytes

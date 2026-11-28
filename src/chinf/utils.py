@@ -210,14 +210,14 @@ def read_batch_result(batchId, **kwargs):
             # non-empty lines into a list of dictionaries
             resp = [json.loads(line) for line in response_data.strip().splitlines() if line]
             # resp = json.loads(response_data)
-            if len(resp) == 1:
-                if resp[0]['status'] == 'succeeded':
-                    return resp[0]
-                else:
-                    empty_return = {'result': {'content': [{'type': 'text', 'text':''}]}}
-                    return empty_return
-            else:
-                return resp
+            # if len(resp) == 1:
+            #     if resp[0]['status'] == 'succeeded':
+            #         return resp[0]
+            #     else:
+            #         empty_return = {'result': {'content': [{'type': 'text', 'text':''}]}}
+            #         return empty_return
+            # else:
+            return resp
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)

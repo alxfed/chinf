@@ -30,7 +30,7 @@ def batch_request(batch=None, **kwargs):
     while True:
         # Sleep a little bit
         try:
-            sleep(10)
+            sleep(30)
             count += 1
         except NameError:
             count = 1
@@ -40,12 +40,12 @@ def batch_request(batch=None, **kwargs):
             result = read_batch_result(batchId=batchId)
             break
         if count == 60:
-            return '', ''
+            result = [{'error_batchId': batchId}]
 
-    list_of_dict = result['result']['content']
-    thoughts, text, function_calls = decode(list_of_dict)
+    # list_of_dict = result['result']['content']
+    # thoughts, text, function_calls = decode(list_of_dict)
 
-    return thoughts, text
+    return result
 
 def start_batch(batch=None, **kwargs):
     """ All parameters should be in kwargs, but they are optional
@@ -91,7 +91,7 @@ def cancel_batch(batchid):
 
 def batch_result(batchid):
     result = read_batch_result(batchid)
-
+    return result
 
 if __name__ == "__main__":
     ...

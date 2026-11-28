@@ -27,7 +27,7 @@ headers = {
     "Authorization": f"Bearer {api_key}",
     "X-Api-Key": api_key,
     "X-CI-Model-Lock": True,
-    "Anthropic-Version": "2023-06-01",
+    # "Anthropic-Version": "2023-06-01",
     "User-Agent": "chinf"
 }
 
@@ -121,7 +121,7 @@ def start_batch_query(payload, **kwargs):
     """
     # Read model from kwargs or substitute the default into the header and on.
     model = kwargs.get("model", default_batch_model)
-    batch_headers["ai-model-id"] = model
+    # batch_headers["ai-model-id"] = model
 
     # Convert data dictionary to JSON and encode it to bytes
     data_bytes = json.dumps(payload).encode('utf-8')
@@ -207,12 +207,17 @@ def read_batch_result(batchId, **kwargs):
         with urllib.request.urlopen(req, timeout=3000) as response:
             headers = dict(response.headers)
             response_data = response.read().decode('utf-8')
-            resp = json.loads(response_data)
-            if resp['status'] == 'succeeded':
-                return resp
+            # non-empty lines into a list of dictionaries
+            resp = [json.loads(line) for line in response_data.strip().splitlines() if line]
+            # resp = json.loads(response_data)
+            if len(resp) == 1:
+                if resp[0]['status'] == 'succeeded':
+                    return resp[0]
+                else:
+                    empty_return = {'result': {'content': [{'type': 'text', 'text':''}]}}
+                    return empty_return
             else:
-                empty_return = {'result': {'content': [{'type': 'text', 'text':''}]}}
-                return empty_return
+                return resp
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
@@ -249,9 +254,11 @@ def decode(output):
             addition = chunk.get('text', '')
             if addition not in ('\n\n', '\n'):
                 text += addition
-
         elif chunk_type == 'thinking':
             thoughts += chunk.get('thinking', '')
+        elif chunk_type == 'reasoning':
+            thoughts += chunk.get('text', '')
+
     function_calls = [part for part in output if part['type'] == 'tool_use']
 
     return thoughts, text, function_calls
